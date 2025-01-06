@@ -21,17 +21,17 @@ def frequency_encoding(df):
     pd.DataFrame
         A new DataFrame with categorical columns frequency-encoded.
     """
-    df_copy = df.copy()
+    
 
-    for column in df_copy.select_dtypes(include=['object', 'category']).columns.tolist():
+    for column in df.select_dtypes(include=['object', 'category']).columns.tolist():
 
       # Calculate frequency of each value in the column
-      frequency_map = df_copy[column].value_counts(normalize=True).to_dict()
+      frequency_map = df[column].value_counts(normalize=True).to_dict()
 
       # Replace values in the original column with their frequencies
-      df_copy[column] = df_copy[column].map(frequency_map)
+      df[column] = df[column].map(frequency_map)
 
-    return df_copy
+    return df
 
 def transform_boolean_columns(df):
     """
@@ -53,16 +53,16 @@ def transform_boolean_columns(df):
     pd.DataFrame
         A new DataFrame where boolean columns have been converted to numeric scores.
     """
-    df_copy = df.copy()
-    for col in df_copy.select_dtypes(include='bool'):
-        total = len(df_copy)
-        true_count = df_copy[col].sum()
+    
+    for col in df.select_dtypes(include='bool'):
+        total = len(df)
+        true_count = df[col].sum()
         true_prop = true_count / total
         false_prop = 1 - true_prop
 
-        df_copy[col] = df_copy[col].apply(lambda x: (1 - true_prop) if x else (1 - false_prop))
+        df[col] = df[col].apply(lambda x: (1 - true_prop) if x else (1 - false_prop))
 
-    return df_copy
+    return df
 
 def pairwise_feature_generation(df):
     """
@@ -83,40 +83,40 @@ def pairwise_feature_generation(df):
         A new DataFrame with original columns plus additional interaction features.
     """
 
-    df_copy = df.copy()
+    
 
     # Identify numeric columns
-    numeric_cols = df_copy.select_dtypes(include=np.number).columns.tolist()
+    numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
 
     interaction_data = {}
 
     # 1. Squared terms
     for feat in numeric_cols:
-        interaction_data[f"{feat}^2"] = df_copy[feat] ** 2
+        interaction_data[f"{feat}^2"] = df[feat] ** 2
 
     # 2. Square roots
     for feat in numeric_cols:
-        interaction_data[f"sqrt_{feat}"] = df_copy[feat] ** 0.5  # or np.sqrt(df_copy[feat].abs())
+        interaction_data[f"sqrt_{feat}"] = df[feat] ** 0.5  # or np.sqrt(df[feat].abs())
 
     # 3. Multiplications (combinations)
     for feat_a, feat_b in combinations(numeric_cols, 2):
-        interaction_data[f"{feat_a}_x_{feat_b}"] = df_copy[feat_a] * df_copy[feat_b]
+        interaction_data[f"{feat_a}_x_{feat_b}"] = df[feat_a] * df[feat_b]
 
     # 4. Divisions (permutations)
     for feat_a, feat_b in permutations(numeric_cols, 2):
         interaction_name = f"{feat_a}_div_{feat_b}"
         with np.errstate(divide='ignore', invalid='ignore'):
             division_result = np.where(
-                df_copy[feat_b] != 0,
-                df_copy[feat_a] / df_copy[feat_b],
+                df[feat_b] != 0,
+                df[feat_a] / df[feat_b],
                 0
             )
         interaction_data[interaction_name] = division_result
 
-    interaction_df = pd.DataFrame(interaction_data, index=df_copy.index)
+    interaction_df = pd.DataFrame(interaction_data, index=df.index)
 
     # Concatenate new features
-    return pd.concat([df_copy, interaction_df], axis=1)
+    return pd.concat([df, interaction_df], axis=1)
 
 def feature_scaling_standard(df):
     """
@@ -134,9 +134,9 @@ def feature_scaling_standard(df):
         A new DataFrame where numeric columns are scaled with StandardScaler.
     """
 
-    df_copy = df.copy()
-    numerical_cols = df_copy.select_dtypes(include=np.number).columns
+    
+    numerical_cols = df.select_dtypes(include=np.number).columns
     scaler = StandardScaler()
-    df_copy[numerical_cols] = scaler.fit_transform(df_copy[numerical_cols])
+    df[numerical_cols] = scaler.fit_transform(df[numerical_cols])
 
-    return df_copy
+    return df

@@ -3,7 +3,7 @@
 import pandas as pd
 
 # Data Cleaning
-from data_cleaning import (
+from .data_cleaning import (
     drop_single_value_columns,
     impute_missing_values,
     convert_to_boolean,
@@ -11,14 +11,14 @@ from data_cleaning import (
 )
 
 # GPT Transformation
-from gpt_transformation import (
+from .gpt_transformation import (
     config_client,
     build_prompt_from_df,
     call_gpt_for_transformation
 )
 
 # Feature Transformation
-from feature_transformation import (
+from .feature_transformation import (
     frequency_encoding,
     transform_boolean_columns,
     pairwise_feature_generation,
@@ -26,7 +26,7 @@ from feature_transformation import (
 )
 
 # Feature Reduction
-from feature_reduction import ant_colony_optimization_search
+from .feature_reduction import ant_colony_optimization_search
 
 
 class automated_feature_engineering:
@@ -68,6 +68,8 @@ class automated_feature_engineering:
         self : AutomatedPipeline
             (For method chaining)
         """
+        print("[STEP 1]: CLEANING DATA...\n")
+
         # 1) Drop single-value columns
         self.df = drop_single_value_columns(self.df)
         # 2) Impute missing
@@ -98,6 +100,8 @@ class automated_feature_engineering:
         -------
         self : AutomatedPipeline
         """
+        print("[STEP 2]: CALLING GPT...\n")
+
         # Build the prompt from self.df
         prompt = build_prompt_from_df(self.df, use_checklist=use_checklist)
         # Ask GPT to produce transformation code
@@ -150,6 +154,8 @@ class automated_feature_engineering:
         -------
         self : automated_feature_engineering
         """
+        print("[STEP 3]: TRANSFORMING FEATURES...\n")
+
         # 1) Frequency encode categorical columns
         self.df = frequency_encoding(self.df)
         # 2) Convert boolean columns to numeric weighting
@@ -175,6 +181,8 @@ class automated_feature_engineering:
         -------
         self : AutomatedPipeline
         """
+        print("[STEP 4]: PERFORMING FEATURE SEARCH...\n")
+
         best_feats, best_score, best_k = ant_colony_optimization_search(self.df)
 
         # (Optional) Store meta info

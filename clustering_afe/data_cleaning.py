@@ -16,11 +16,11 @@ def drop_single_value_columns(df: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame
         A copy of the input DataFrame, excluding columns with a single distinct value.
     """
-    df_copy = df.copy()
-    for col in df_copy.columns:
-        if df_copy[col].nunique() == 1:
-            df_copy.drop(col, axis=1, inplace=True)
-    return df_copy
+    
+    for col in df.columns:
+        if df[col].nunique() == 1:
+            df.drop(col, axis=1, inplace=True)
+    return df
 
 def impute_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -38,15 +38,15 @@ def impute_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame
         A copy of the input DataFrame with missing values imputed.
     """
-    df_copy = df.copy()
-    for col in df_copy.columns:
-        if pd.api.types.is_numeric_dtype(df_copy[col]):
-            median_val = df_copy[col].median()
-            df_copy[col].fillna(median_val, inplace=True)
+    
+    for col in df.columns:
+        if pd.api.types.is_numeric_dtype(df[col]):
+            median_val = df[col].median()
+            df[col].fillna(median_val, inplace=True)
         else:
-            mode_val = df_copy[col].mode()[0]
-            df_copy[col].fillna(mode_val, inplace=True)
-    return df_copy
+            mode_val = df[col].mode()[0]
+            df[col].fillna(mode_val, inplace=True)
+    return df
 
 def convert_to_boolean(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -62,27 +62,27 @@ def convert_to_boolean(df: pd.DataFrame) -> pd.DataFrame:
     pd.DataFrame
         A copy of the DataFrame with certain columns converted to bool dtype.
     """
-    df_copy = df.copy()
-    for col in df_copy.columns:
-        unique_vals = set(df_copy[col].dropna().unique())
+    
+    for col in df.columns:
+        unique_vals = set(df[col].dropna().unique())
         if unique_vals == {0, 1} or unique_vals == {True, False}:
-            df_copy[col] = df_copy[col].astype(bool)
-    return df_copy
+            df[col] = df[col].astype(bool)
+    return df
 
 def winsorize_outliers(df: pd.DataFrame):
     """
     Winsorizes numeric columns in the DataFrame by clamping values
     below the 1st percentile (p1) and above the 99th percentile (p99).
     Returns:
-      - df_copy: The winsorized DataFrame (copy of the original)
+      - df: The winsorized DataFrame (copy of the original)
       - outlier_mask: Boolean mask (DataFrame) indicating where outliers occurred
     """
-    df_copy = df.copy()
-    numeric_cols = df_copy.select_dtypes(include=np.number).columns
+    
+    numeric_cols = df.select_dtypes(include=np.number).columns
 
-    p1 = df_copy[numeric_cols].quantile(0.01)
-    p99 = df_copy[numeric_cols].quantile(0.99)
+    p1 = df[numeric_cols].quantile(0.01)
+    p99 = df[numeric_cols].quantile(0.99)
 
-    df_copy[numeric_cols] = df_copy[numeric_cols].clip(lower=p1, upper=p99, axis=1)
+    df[numeric_cols] = df[numeric_cols].clip(lower=p1, upper=p99, axis=1)
 
-    return df_copy
+    return df

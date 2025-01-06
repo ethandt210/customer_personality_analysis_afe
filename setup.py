@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="clustering_afe",
-    version="1.0",
+    version="1.0.4",
     packages=find_packages(),
     description="A Python library for automated feature engineering tailored to clustering in customer personality analysis within the retail industry.",
     long_description=open("README.md").read(),
@@ -18,8 +18,8 @@ setup(
     ],
     python_requires=">=3.7",
     install_requires=[
-        "openai==1.55.3", # Faced issue with newer version
-        "httpx==0.27.2", # Faced issue with newer version
+        "openai>=1.55.3", # Faced issue with newer version
+        "httpx>=0.27.2", # Faced issue with newer version
         "pandas",
         "numpy",
         "scikit-learn",
