@@ -68,7 +68,7 @@ class automated_feature_engineering:
         self : AutomatedPipeline
             (For method chaining)
         """
-        print("[STEP 1]: CLEANING DATA...\n")
+        print("=========================[STEP 1]: CLEANING DATA...=========================\n")
 
         # 1) Drop single-value columns
         self.df = drop_single_value_columns(self.df)
@@ -100,7 +100,7 @@ class automated_feature_engineering:
         -------
         self : AutomatedPipeline
         """
-        print("[STEP 2]: CALLING GPT...\n")
+        print("=========================[STEP 2]: CALLING GPT...=========================\n")
 
         # Build the prompt from self.df
         prompt = build_prompt_from_df(self.df, use_checklist=use_checklist)
@@ -154,7 +154,7 @@ class automated_feature_engineering:
         -------
         self : automated_feature_engineering
         """
-        print("[STEP 3]: TRANSFORMING FEATURES...\n")
+        print("=========================[STEP 3]: TRANSFORMING FEATURES...=========================\n")
 
         # 1) Frequency encode categorical columns
         self.df = frequency_encoding(self.df)
@@ -181,7 +181,7 @@ class automated_feature_engineering:
         -------
         self : AutomatedPipeline
         """
-        print("[STEP 4]: PERFORMING FEATURE SEARCH...\n")
+        print("=========================[STEP 4]: PERFORMING FEATURE SEARCH...=========================\n")
 
         best_feats, best_score, best_k = ant_colony_optimization_search(self.df)
 
@@ -237,5 +237,6 @@ class automated_feature_engineering:
         if do_aco:
             self.feature_reduction()
 
+        print("=========================[DONE]=========================")
         # Return the final DataFrame
         return self.df
