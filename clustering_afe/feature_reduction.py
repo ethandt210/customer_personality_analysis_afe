@@ -1,5 +1,6 @@
 from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 import numpy as np
 import pandas as pd
 
@@ -82,16 +83,17 @@ def ant_colony_optimization_search(
             subsets.append(selected_features)
 
             cluster_data = df[list(selected_features)]
+            df_reduced = PCA(n_components=3).fit_transform(cluster_data)
             best_local_fitness = float('-inf')
             best_local_k = None
 
             for n_clusters in range(cluster_range[0], cluster_range[1] + 1):
                 # Apply KMeans clustering
-                kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(cluster_data)
+                kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(df_reduced)
 
                 # Compute CHI and DBI
-                chi_score = calinski_harabasz_score(cluster_data, kmeans.labels_)
-                dbi_score = davies_bouldin_score(cluster_data, kmeans.labels_)
+                chi_score = calinski_harabasz_score(df_reduced, kmeans.labels_)
+                dbi_score = davies_bouldin_score(df_reduced, kmeans.labels_)
 
                 # The objective: maximize CHI, minimize DBI
                 fitness = (w_chi * chi_score) - (w_dbi * dbi_score)
