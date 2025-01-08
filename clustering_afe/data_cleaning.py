@@ -75,7 +75,6 @@ def winsorize_outliers(df: pd.DataFrame):
     below the 1st percentile (p1) and above the 99th percentile (p99).
     Returns:
       - df: The winsorized DataFrame (copy of the original)
-      - outlier_mask: Boolean mask (DataFrame) indicating where outliers occurred
     """
     
     numeric_cols = df.select_dtypes(include=np.number).columns
