@@ -102,12 +102,10 @@ class automated_feature_engineering:
         """
         print("=========================[STEP 2]: CALLING GPT...=========================\n")
 
-        # Build the prompt from self.df
         prompt = build_prompt_from_df(self.df, use_checklist=use_checklist)
-        # Ask GPT to produce transformation code
+
         code_response = call_gpt_for_transformation(prompt)
 
-        # Execute the code blocks from GPT on self.df
         self.run_code_blocks(code_response)
 
         return self
@@ -125,7 +123,6 @@ class automated_feature_engineering:
         code_snippets = re.findall(r"<start_code>\n(.*?)\n<end_code>", gpt_code, re.DOTALL)
 
         if not code_snippets:
-            # Possibly GPT returned no code blocks, handle gracefully
             print("No <start_code>...<end_code> blocks found in GPT response.")
             return
 
@@ -185,7 +182,7 @@ class automated_feature_engineering:
 
         best_feats, best_score, best_k = ant_colony_optimization_search(self.df)
 
-        # (Optional) Store meta info
+        # Store meta info
         self.meta_info["best_features"] = best_feats
         self.meta_info["best_fitness"] = best_score
         self.meta_info["best_k"] = best_k

@@ -10,7 +10,7 @@ def ant_colony_optimization_search(
     max_iter: int = 100,
     cluster_range: tuple = (2, 5),
     w_chi: float = 1.0,
-    w_dbi: float = 1.0
+    w_dbi: float = 10
 ):
     """
     Ant Colony Optimization (ACO) for feature selection with CHI and DBI as evaluation metrics.
