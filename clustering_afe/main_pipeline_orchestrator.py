@@ -21,7 +21,7 @@ from .gpt_transformation import (
 from .feature_transformation import (
     frequency_encoding,
     transform_boolean_columns,
-    pairwise_feature_generation,
+    pairwise_metafeature_generation,
     feature_scaling_standard
 )
 
@@ -142,7 +142,7 @@ class automated_feature_engineering:
     # -------------------------------------------------------------------------
     # Feature Transformations
     # -------------------------------------------------------------------------
-    def feature_transforms(self) -> "automated_feature_engineering":
+    def meta_feature_transform(self) -> "automated_feature_engineering":
         """
         Example advanced transformations:
           1) Frequency encoding for categorical columns
@@ -154,15 +154,37 @@ class automated_feature_engineering:
         -------
         self : automated_feature_engineering
         """
-        print("=========================[STEP 3]: TRANSFORMING FEATURES...=========================\n")
+        print("=========================[STEP 3]: TRANSFORMING META-FEATURES...=========================\n")
 
         # 1) Frequency encode categorical columns
         self.transformed_df = frequency_encoding(self.transformed_df)
         # 2) Convert boolean columns to numeric weighting
         self.transformed_df = transform_boolean_columns(self.transformed_df)
         # 3) Generate pairwise interactions
-        self.transformed_df = pairwise_feature_generation(self.transformed_df)
+        self.transformed_df = pairwise_metafeature_generation(self.transformed_df)
         # 4) Apply standard scaling
+        self.transformed_df = feature_scaling_standard(self.transformed_df)
+
+        return self
+    
+    def feature_transform(self) -> "automated_feature_engineering": # Perform feature transformation but without Pairwise Metafeature generation
+        """
+        Example advanced transformations:
+          1) Frequency encoding for categorical columns
+          2) Transform boolean columns to numeric importance
+          3) Standard scaling (z-score)
+
+        Returns
+        -------
+        self : automated_feature_engineering
+        """
+        print("=========================[STEP 3]: TRANSFORMING FEATURES...=========================\n")
+
+        # 1) Frequency encode categorical columns
+        self.transformed_df = frequency_encoding(self.transformed_df)
+        # 2) Convert boolean columns to numeric weighting
+        self.transformed_df = transform_boolean_columns(self.transformed_df)
+        # 3) Apply standard scaling
         self.transformed_df = feature_scaling_standard(self.transformed_df)
 
         return self
@@ -199,12 +221,12 @@ class automated_feature_engineering:
     # -------------------------------------------------------------------------
     # Master Orchestrator
     # -------------------------------------------------------------------------
-    def run_pipeline(self, use_gpt=True, do_feature_engineering=True, do_aco=True) -> pd.DataFrame:
+    def run_pipeline(self, use_gpt=True, do_metafeature_engineering=True, do_aco=True) -> pd.DataFrame:
         """
         Master method that calls each step in a typical sequence:
           1) Data Cleaning
           2) (Optional) GPT transformations
-          3) (Optional) Feature transformations
+          3) (Optional) Meta-Feature transformations
           4) (Optional) Feature reduction (Ant Colony)
           5) Return final DataFrame
 
@@ -230,8 +252,10 @@ class automated_feature_engineering:
             self.gpt_transform(use_checklist=True)
 
         # 3) Feature transformations
-        if do_feature_engineering:
-            self.feature_transforms()
+        if do_metafeature_engineering:
+            self.meta_feature_transform()
+        else:
+            self.feature_transform()
 
         # 4) Feature reduction with Ant Colony
         if do_aco:

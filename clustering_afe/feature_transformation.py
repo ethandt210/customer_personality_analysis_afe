@@ -64,7 +64,7 @@ def transform_boolean_columns(df):
 
     return df
 
-def pairwise_feature_generation(df):
+def pairwise_metafeature_generation(df):
     """
     Generates interaction features from all numeric columns in the DataFrame:
       - Squared terms (column^2)
