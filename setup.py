@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="clustering_afe",
-    version="1.1.3",
+    version="1.1.4",
     packages=find_packages(),
     description="A Python library for automated feature engineering tailored to clustering in customer personality analysis within the retail industry.",
     long_description=open("README.md").read(),
