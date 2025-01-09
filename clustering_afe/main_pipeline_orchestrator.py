@@ -47,7 +47,10 @@ class automated_feature_engineering:
         api_key : str
             Your OpenAI API key for GPT transformations.
         """
-        self.df = df.copy()
+        # Keep original DF untouched
+        # store transformations in self.transformed_df
+        self.original_df = df
+        self.transformed_df = df.copy()  
         config_client(api_key)
 
         self.meta_info = {} # Stores informations of the processed data
@@ -71,13 +74,13 @@ class automated_feature_engineering:
         print("=========================[STEP 1]: CLEANING DATA...=========================\n")
 
         # 1) Drop single-value columns
-        self.df = drop_single_value_columns(self.df)
+        self.transformed_df = drop_single_value_columns(self.transformed_df)
         # 2) Impute missing
-        self.df = impute_missing_values(self.df)
+        self.transformed_df = impute_missing_values(self.transformed_df)
         # 3) Convert to boolean
-        self.df = convert_to_boolean(self.df)
+        self.transformed_df = convert_to_boolean(self.transformed_df)
         # 4) Winsorize outliers (clamp p1/p99)
-        self.df = winsorize_outliers(self.df)
+        self.transformed_df = winsorize_outliers(self.transformed_df)
 
         return self
 
@@ -102,7 +105,7 @@ class automated_feature_engineering:
         """
         print("=========================[STEP 2]: CALLING GPT...=========================\n")
 
-        prompt = build_prompt_from_df(self.df, use_checklist=use_checklist)
+        prompt = build_prompt_from_df(self.transformed_df, use_checklist=use_checklist)
 
         code_response = call_gpt_for_transformation(prompt)
 
@@ -119,7 +122,7 @@ class automated_feature_engineering:
         import re, copy
         import numpy as np
 
-        df_local = self.df.copy()
+        df_local = self.transformed_df.copy()
         code_snippets = re.findall(r"<start_code>\n(.*?)\n<end_code>", gpt_code, re.DOTALL)
 
         if not code_snippets:
@@ -134,7 +137,7 @@ class automated_feature_engineering:
             except Exception as e:
                 print(f"Error executing GPT code snippet: {e}")
 
-        self.df = local_scope["df"]
+        self.transformed_df = local_scope["df"]
 
     # -------------------------------------------------------------------------
     # Feature Transformations
@@ -154,13 +157,13 @@ class automated_feature_engineering:
         print("=========================[STEP 3]: TRANSFORMING FEATURES...=========================\n")
 
         # 1) Frequency encode categorical columns
-        self.df = frequency_encoding(self.df)
+        self.transformed_df = frequency_encoding(self.transformed_df)
         # 2) Convert boolean columns to numeric weighting
-        self.df = transform_boolean_columns(self.df)
+        self.transformed_df = transform_boolean_columns(self.transformed_df)
         # 3) Generate pairwise interactions
-        self.df = pairwise_feature_generation(self.df)
+        self.transformed_df = pairwise_feature_generation(self.transformed_df)
         # 4) Apply standard scaling
-        self.df = feature_scaling_standard(self.df)
+        self.transformed_df = feature_scaling_standard(self.transformed_df)
 
         return self
 
@@ -180,7 +183,7 @@ class automated_feature_engineering:
         """
         print("=========================[STEP 4]: PERFORMING FEATURE SEARCH...=========================\n")
 
-        best_feats, best_score, best_k = ant_colony_optimization_search(self.df)
+        best_feats, best_score, best_k = ant_colony_optimization_search(self.transformed_df)
 
         # Store meta info
         self.meta_info["best_features"] = best_feats
@@ -188,8 +191,8 @@ class automated_feature_engineering:
         self.meta_info["best_k"] = best_k
 
         # Optionally reduce self.df to those best_feats
-        final_cols = [col for col in best_feats if col in self.df.columns]
-        self.df = self.df[final_cols]
+        final_cols = [col for col in best_feats if col in self.transformed_df.columns]
+        self.transformed_df = self.transformed_df[final_cols]
 
         return self
 
@@ -236,4 +239,4 @@ class automated_feature_engineering:
 
         print("=========================[DONE]=========================")
         # Return the final DataFrame
-        return self.df
+        return self.transformed_df
