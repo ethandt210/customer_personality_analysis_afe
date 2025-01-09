@@ -66,7 +66,7 @@ class automated_clustering:
 
         return self.df_pca, (self.chi_score, self.dbi_score)
 
-    def visualize_clusters(self, cluster_col="cluster"):
+    def visualize_clusters(self, cluster_col="cluster", chart_title="Clustering Result"):
         """
         Uses the visualize_clustering function to plot the 3D PCA data with cluster labels.
 
@@ -85,5 +85,6 @@ class automated_clustering:
             x_col="comp1",
             y_col="comp2",
             z_col="comp3",
-            cluster_col=cluster_col
+            cluster_col=cluster_col,
+            chart_title=chart_title
         )
