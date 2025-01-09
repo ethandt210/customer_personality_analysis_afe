@@ -10,7 +10,8 @@ def ant_colony_optimization_search(
     max_iter: int = 100,
     cluster_range: tuple = (2, 5),
     w_chi: float = 1.0,
-    w_dbi: float = 10
+    w_dbi: float = 100.0,
+    random_state: int = 0
 ):
     """
     Ant Colony Optimization (ACO) for feature selection with CHI and DBI as evaluation metrics.
@@ -67,6 +68,8 @@ def ant_colony_optimization_search(
     best_fitness = float('-inf')
     best_k = None
 
+    numpy_random = np.random.default_rng(seed=random_state)
+
     for iteration in range(max_iter):
         subsets = []
         fitness_scores = []
@@ -74,7 +77,7 @@ def ant_colony_optimization_search(
 
         # Each ant constructs a feature subset
         for _ in range(n_ants):
-            selected_features = np.random.choice(
+            selected_features = numpy_random.choice(
                 df.columns,
                 max_features,
                 replace=False,
