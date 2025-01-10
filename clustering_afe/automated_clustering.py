@@ -47,7 +47,7 @@ class automated_clustering:
         Returns
         -------
         self.df_pca : pd.DataFrame
-            PCA DataFrame with an added 'Cluster' column.
+            PCA DataFrame with an added 'cluster' label column.
         (chi_score, dbi_score) : tuple of floats
             Calinski-Harabasz and Davies-Bouldin scores for the clustering.
         """

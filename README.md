@@ -36,6 +36,11 @@ With a single orchestrator pipeline, users can:
    - A single class (`AutomatedPipeline`) that ties all steps into a `.run_pipeline()` call
    - Configurable toggles to skip or include GPT transformations, advanced feature ops, or ACO-based reduction
 
+6. **Automated Clustering and Visualization**
+   - Perform Principal Component Analysis (PCA) with IQR filtering to select the top 3 valid components.
+   - Use KMeans clustering to group customers into distinct segments.
+   - Visualize clusters in 3D using interactive plotly
+
 ## Installation
 1. **Clone or Download** this repo:
    ```bash
@@ -48,6 +53,7 @@ With a single orchestrator pipeline, users can:
    ```
 
 ## Usage Example
+**Automated Feature Engineering Pipeline**
 ```python
 import pandas as pd
 from clustering_afe import automated_feature_engineering
@@ -74,4 +80,26 @@ df_final = afe.run_pipeline(
 
 print("Final DataFrame Shape:", df_final.shape)
 print("Selected Features:", pipeline.meta_info.get("best_features"))
+```
+
+**Automated Clustering and Visualization**
+```python
+import pandas as pd
+from clustering_afe import automated_clustering
+
+# Initialize the clustering pipeline
+clustering = automated_clustering(df_final)
+
+# Normalize components via PCA (up to 10 components, retain top 3 valid ones)
+df_pca = clustering.run_component_normalization(n_components=10)
+
+# Cluster the data using KMeans
+df_pca, (chi, dbi) = clustering.cluster_pca_kmeans(n_clusters=afe.meta_info['best_k'], random_state=42)
+
+print(f"Calinski-Harabasz Score: {chi}")
+print(f"Davies-Bouldin Score: {dbi}")
+
+# Visualize the clusters in 3D
+clustering.visualize_clusters(cluster_col="cluster", chart_title="Customer Segmentation")
+
 ```
