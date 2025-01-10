@@ -3,9 +3,6 @@ import numpy as np
 from itertools import combinations, permutations
 from sklearn.preprocessing import StandardScaler
 
-
-# prompt: create a function for frequency encoding with argument receiving df_input, it should replace the value in the original column directly
-
 def frequency_encoding(df):
     """
     Performs frequency encoding on all categorical (object/category) columns in the DataFrame.
