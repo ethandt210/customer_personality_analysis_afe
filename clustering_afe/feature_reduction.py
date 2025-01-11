@@ -7,7 +7,7 @@ import pandas as pd
 def ant_colony_optimization_search(
     df: pd.DataFrame,
     n_ants: int = 20,
-    max_iter: int = 100,
+    max_iter: int = 300,
     cluster_range: tuple = (2, 5),
     w_chi: float = 1.0,
     w_dbi: float = 100.0,
@@ -57,10 +57,7 @@ def ant_colony_optimization_search(
     - Each ant randomly selects features with probability weighted by current pheromones.
     - After evaluating each subset, pheromones are updated to encourage selecting features that led to better fitness.
     """
-    max_features = int(0.001 * len(df.columns))
-
-    if max_features < 10:
-        max_features = 10
+    max_features = 5
 
     n_features = df.shape[1]
     pheromones = np.ones(n_features) / n_features
