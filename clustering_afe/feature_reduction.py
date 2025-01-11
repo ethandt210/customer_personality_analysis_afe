@@ -57,7 +57,7 @@ def ant_colony_optimization_search(
     - Each ant randomly selects features with probability weighted by current pheromones.
     - After evaluating each subset, pheromones are updated to encourage selecting features that led to better fitness.
     """
-    max_features = int(0.05 * len(df.columns))
+    max_features = int(0.001 * len(df.columns))
 
     if max_features < 10:
         max_features = 10

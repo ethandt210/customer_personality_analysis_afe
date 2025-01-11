@@ -7,7 +7,7 @@ import numpy as np
 from clustering_afe.feature_transformation import (
     frequency_encoding,
     transform_boolean_columns,
-    pairwise_feature_generation,
+    pairwise_metafeature_generation,
     feature_scaling_standard
 )
 
@@ -61,7 +61,7 @@ def test_pairwise_feature_generation():
     })
 
     # Generate pairwise features
-    result = pairwise_feature_generation(df) 
+    result = pairwise_metafeature_generation(df) 
 
     # Expected new columns:
     #   X^2, sqrt_X, Y^2, sqrt_Y,
