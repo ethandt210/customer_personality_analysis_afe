@@ -103,4 +103,5 @@ def visualize_clustering(pca_df: pd.DataFrame,
     )
 
     fig = go.Figure(data=data, layout=layout)
-    fig.show()
+    
+    return fig

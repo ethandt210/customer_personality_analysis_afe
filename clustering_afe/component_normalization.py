@@ -42,11 +42,12 @@ def component_normalization(df: pd.DataFrame, n_components: int = 10) -> pd.Data
 
     valid_cols = iqr_ratios[iqr_ratios <= cutoff].index.tolist()
 
-    # If none pass the cutoff, fallback to the 3 with the lowest ratio
-    if not valid_cols:
-        valid_cols = iqr_ratios.sort_values().index.tolist()[:3]
+    # If fewer than 3 valid components, select top available components
+    if len(valid_cols) < 3:
+        missing_count = 3 - len(valid_cols)
+        additional_cols = iqr_ratios.sort_values().index.difference(valid_cols).tolist()[:missing_count]
+        valid_cols.extend(additional_cols)
 
-    valid_cols = valid_cols[:3]
-    df_pca = pca_ds[valid_cols]
+    df_pca = pca_ds[valid_cols[:3]]
 
     return df_pca

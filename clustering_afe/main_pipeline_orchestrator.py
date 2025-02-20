@@ -142,7 +142,7 @@ class automated_feature_engineering:
     # -------------------------------------------------------------------------
     # Feature Transformations
     # -------------------------------------------------------------------------
-    def meta_feature_transform(self) -> "automated_feature_engineering":
+    def meta_feature_transform(df) -> "automated_feature_engineering":
         """
         Example advanced transformations:
           1) Frequency encoding for categorical columns

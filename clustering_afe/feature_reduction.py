@@ -60,7 +60,10 @@ def ant_colony_optimization_search(
     max_features = int(0.05 * len(df.columns))
 
     if max_features < 10:
-        max_features = 10
+        if len(df.columns) < 10:
+            max_features = len(df.columns)
+        else:
+            max_features = 10
 
     n_features = df.shape[1]
     pheromones = np.ones(n_features) / n_features
