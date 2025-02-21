@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
+# import plotly.express as px
 import re
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -182,7 +182,6 @@ if uploaded_file is not None:
         st.write("Processed Dataset:", df_processed.head())
 
         st.write(f"Optimal number of clusters (k): {best_k}")
-
         # Clustering with PCA + KMeans
         with st.spinner("Running PCA and Clustering..."):
             st.subheader("3️⃣ Clustering using PCA & KMeans")
