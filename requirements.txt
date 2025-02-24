@@ -6,6 +6,8 @@ matplotlib
 numpy==1.26.4
 scikit-learn==1.6.0
 scipy==1.13.1
+seaborn
 shap
 streamlit
 plotly>=5.24.0
+catboost
