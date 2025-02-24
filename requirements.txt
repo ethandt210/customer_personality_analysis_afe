@@ -1,9 +1,10 @@
 # Requirements for AFE Module
-streamlit
 openai>=1.55.3 # Faced issue with newer version
 httpx>=0.27.2 # Faced issue with newer version
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.6.0
 scipy==1.13.1
+shap
+streamlit
 plotly>=5.24.0
