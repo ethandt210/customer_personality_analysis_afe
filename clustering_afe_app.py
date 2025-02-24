@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-# import plotly.express as px
+import plotly.express as px
 import re
-# from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import time
 
