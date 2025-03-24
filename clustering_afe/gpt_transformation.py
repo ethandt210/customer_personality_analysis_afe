@@ -128,7 +128,6 @@ def gpt_checklist(prompt, model= "gpt-4o", temperature = 0.25):
                 Store Visit Frequency (if applicable)
 
                 5. Campaign Responses
-                Total Campaigns Accepted
                 Campaign Acceptance Rate
                 Last Campaign Accepted (recency of campaign interaction)
                 Response to Individual Campaigns (binary indicators or counts)

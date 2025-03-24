@@ -3,6 +3,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 def ant_colony_optimization_search(
     df: pd.DataFrame,
@@ -57,13 +58,7 @@ def ant_colony_optimization_search(
     - Each ant randomly selects features with probability weighted by current pheromones.
     - After evaluating each subset, pheromones are updated to encourage selecting features that led to better fitness.
     """
-    max_features = int(0.05 * len(df.columns))
-
-    if max_features < 10:
-        if len(df.columns) < 10:
-            max_features = len(df.columns)
-        else:
-            max_features = 10
+    max_features = max(int(0.05 * len(df.columns)), min(10, len(df.columns)))
 
     n_features = df.shape[1]
     pheromones = np.ones(n_features) / n_features
@@ -73,18 +68,24 @@ def ant_colony_optimization_search(
 
     numpy_random = np.random.default_rng(seed=random_state)
 
+    st.subheader("🔍 ACO Optimization Process")
+    
+    # Create a scrollable container with a fixed height
+    with st.container():
+        aco_log = st.markdown("<div style='height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;' id='log-container'></div>", unsafe_allow_html=True)
+
+    log_history = ""  # Store logs as a string
+
     for iteration in range(max_iter):
         subsets = []
         fitness_scores = []
         cluster_counts = []
 
-        # Each ant constructs a feature subset
+        log_entry = f"<b>Iteration {iteration+1}/{max_iter}</b> - "
+
         for _ in range(n_ants):
             selected_features = numpy_random.choice(
-                df.columns,
-                max_features,
-                replace=False,
-                p=pheromones / sum(pheromones)
+                df.columns, max_features, replace=False, p=pheromones / sum(pheromones)
             )
             subsets.append(selected_features)
 
@@ -94,33 +95,38 @@ def ant_colony_optimization_search(
             best_local_k = None
 
             for n_clusters in range(cluster_range[0], cluster_range[1] + 1):
-                # Apply KMeans clustering
                 kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(df_reduced)
-
-                # Compute CHI and DBI
                 chi_score = calinski_harabasz_score(df_reduced, kmeans.labels_)
                 dbi_score = davies_bouldin_score(df_reduced, kmeans.labels_)
-
-                # The objective: maximize CHI, minimize DBI
                 fitness = (w_chi * chi_score) - (w_dbi * dbi_score)
 
-                # Update the best local fitness and cluster count
                 if fitness > best_local_fitness:
                     best_local_fitness = fitness
                     best_local_k = n_clusters
 
-            # Append the best local fitness and cluster count for this ant
             fitness_scores.append(best_local_fitness)
             cluster_counts.append(best_local_k)
 
-        # Update global best subset, fitness, and k
         max_fitness = max(fitness_scores)
+        best_k_for_iteration = cluster_counts[fitness_scores.index(max_fitness)]
+        
+        log_entry += f"Best Score: {max_fitness:.4f}, Best k - cluster: {best_k_for_iteration}"
+
         if max_fitness > best_fitness:
             best_fitness = max_fitness
             best_subset = subsets[fitness_scores.index(max_fitness)]
-            best_k = cluster_counts[fitness_scores.index(max_fitness)]
+            best_k = best_k_for_iteration
+            log_entry += f" 🎉 <b>New Best Found!</b>"
 
-        # Update pheromones
+            # Show selected features in a collapsible section
+            log_entry += f"""<br><details><summary>🔹 <b>Selected Features</b> (Click to Expand)</summary>
+                             <pre>{best_subset}</pre></details>"""
+
+        log_history += log_entry + "<hr>"   # Keep history of all logs
+
+        # Update the container dynamically
+        aco_log.markdown(f"<div style='height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;'>{log_history}</div>", unsafe_allow_html=True)
+
         for i, feature in enumerate(df.columns):
             feature_in_subsets = [feature in subset for subset in subsets]
             pheromones[i] += np.sum([fitness for fitness, selected in zip(fitness_scores, feature_in_subsets) if selected])
