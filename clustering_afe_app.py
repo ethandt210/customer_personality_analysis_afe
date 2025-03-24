@@ -11,7 +11,7 @@ import time
 from clustering_afe.automated_clustering import automated_clustering
 from clustering_afe.visualize_clustering import visualize_clustering
 from clustering_afe.main_pipeline_function import meta_feature_transform, feature_reduction, feature_transform
-from clustering_afe.feature_importance_selection import select_important_features, plot_feature_importance_parallel
+from clustering_afe.feature_importance_selection import select_important_features, plot_feature_importance_parallel, plot_feature_correlation_matrix
 from clustering_afe.data_cleaning import drop_single_value_columns, impute_missing_values, convert_to_boolean, winsorize_outliers
 
 st.set_page_config(page_title='Automated Feature Engineering & Clustering', layout='wide')
@@ -187,7 +187,7 @@ if uploaded_file is not None:
             st.subheader("3️⃣ Clustering using PCA & KMeans")
             clustering_model = automated_clustering(df_processed)
             df_pca = clustering_model.run_component_normalization()
-            df_pca, (chi_score, dbi_score) = clustering_model.cluster_pca_kmeans(n_clusters=best_k)
+            df_pca, (chi_score, dbi_score) = clustering_model.cluster_pca_kmeans(n_clusters=5)
 
         # Attach Cluster Labels
         st.write("Clustered Component Data:", df_pca.head())
@@ -205,17 +205,24 @@ if uploaded_file is not None:
 
 
             labeled_df = download_df.copy()
-            labeled_df['cluster'] = KMeans(n_clusters=best_k).fit_predict(df_pca)
+            labeled_df['cluster'] = KMeans(n_clusters=5).fit_predict(df_pca)
 
         # Feature Selection and Parallel Coordinates Plot
-        with st.spinner("Selecting important features and generating parallel coordinates plot..."):
-            st.subheader("Feature Importance using CatBoost & Parallel Coordinates Plot")
+        with st.spinner("Selecting important features and generating visualizations..."):
+            st.subheader("Feature Importance using CatBoost")
             top_features = select_important_features(labeled_df, cluster_col='cluster', top_n=5)
             st.write(f"Top {5} Important Features:", top_features)
 
+            # Parallel Coordinates Plot
             st.markdown("### Cluster Movement Through Important Features")
-            fig = plot_feature_importance_parallel(labeled_df, cluster_col="cluster", top_n=5)
-            st.pyplot(fig)        
+            fig_parallel = plot_feature_importance_parallel(labeled_df, cluster_col="cluster", top_n=5)
+            st.pyplot(fig_parallel)
+
+            # Scatter Plot with Selected Features (AFTER PCA visualization)
+            if len(top_features) == 5:
+                st.markdown("### Feature Correlation Matrix")
+                fig_correlation = plot_feature_correlation_matrix(labeled_df, cluster_col="cluster")
+                st.pyplot(fig_correlation)
 
         # Download Results
         st.download_button(
